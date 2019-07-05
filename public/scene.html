@@ -4,7 +4,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>8th Wall Sence Example</title>
+  <title>CityAR- Smarter City with AR Tech</title>
   <script src="//cdn.8thwall.com/web/aframe/8frame-0.9.0.min.js"></script>
   <script src="//cdn.8thwall.com/web/xrextras/xrextras.js"></script>
   <script
@@ -78,59 +78,141 @@
     }
   </style>
   <script>
-    AFRAME.registerComponent('image-target', {
+  
+    AFRAME.registerComponent('startupchallenge-component', {
       init: function () {
         const { object3D, sceneEl } = this.el
-        object3D.visible = false
-        // Sets the position of the frame to match the image target.
+        const startupchallenge_text = document.getElementById('startupchallenge-text')
+        const phandeeyar_text = document.getElementById('phandeeyar-text')
+        const current_model = document.getElementById('startupchallenge')
         const showImage = ({ detail }) => {
-          object3D.quaternion.copy(detail.rotation)
-          object3D.scale.set(detail.scale, detail.scale, detail.scale)
-          object3D.position.set(detail.position.x, detail.position.y + 2, detail.position.z)
-          object3D.visible = true
+          if(current_model.getAttribute('visible')){
+            phandeeyar_text.style.display = "none"
+            startupchallenge_text.style.display = "block"
+          } else {
+            phandeeyar_text.style.display = "block"
+            startupchallenge_text.style.display = "none"
+          }
         }
         sceneEl.addEventListener('xrimagefound', showImage)
-      }
-    })
-
-    AFRAME.registerComponent('background-sound', {
-      init: function () {
-        const { object3D, sceneEl } = this.el
-        const audio = document.getElementById('bgSound')
-        // Update the position of the frame when the image target is found or updated.
-        sceneEl.addEventListener('xrimagefound', () => {
-          audio.play()
+        sceneEl.addEventListener('xrimagelost', () => {
+          startupchallenge_text.style.display = "none";
         })
       }
     })
+
+    AFRAME.registerComponent('phandeeyar-component', {
+      init: function () {
+        const { object3D, sceneEl } = this.el
+        const phandeeyar_text = document.getElementById('phandeeyar-text')
+        const audio = document.getElementById('bgSound')
+        const model = document.getElementById('phandeeyar')
+        // Sets the position of the frame to match the image target.
+        const showImage = ({ detail }) => {
+          if(model.getAttribute('visible')){
+            phandeeyar_text.style.display = "block"
+            audio.play()
+          } else{
+            phandeeyar_text.style.display = "none"
+            audio.pause()
+            audio.currentTime = 0;
+          }
+        }
+        sceneEl.addEventListener('xrimagefound', showImage)
+        // sceneEl.addEventListener('xrimageupdated', showImage)
+        sceneEl.addEventListener('xrimagelost', () => {
+          // object3D.visible = false;
+          phandeeyar_text.style.display = "none";
+          audio.pause(); 
+          audio.currentTime = 0;
+        })
+      }
+    })
+
+    // AFRAME.registerComponent('background-sound', {
+    //   init: function () {
+    //     const { object3D, sceneEl } = this.el
+    //     const audio = document.getElementById('bgSound')
+    //     // Update the position of the frame when the image target is found or updated.
+    //     sceneEl.addEventListener('xrimagefound', () => { audio.play() })
+    //     //sceneEl.addEventListener('xrimageupdated', showImage)
+    //     sceneEl.addEventListener('xrimagelost', () => { audio.pause(); audio.currentTime = 0;})
+
+    //   }
+    // })
 
     AFRAME.registerComponent('clear-button', {
       init: function () {
         const { object3D, sceneEl } = this.el
         const clear_button = document.getElementById('clear')
-        const model = document.getElementById('model')
+        const model = document.getElementById('phandeeyar')
         const audio = document.getElementById('bgSound')
-        const typing_text = document.getElementById('typing')
+        const text = document.getElementById('phandeeyar-text')
 
         const clear_all = () => {
           audio.pause()
           audio.currentTime = 0
           model.setAttribute('visible', "false")
-          typing_text.style.display = "none"
+          text.style.display = "none"
         }
         clear_button.onclick = clear_all
       }
     })
-
-    AFRAME.registerComponent('typing-text', {
-      init: function () {
-        const { object3D, sceneEl } = this.el
-        const typing_text = document.getElementById('typing')
-        sceneEl.addEventListener('xrimagefound', () => {
-          typing_text.style.display = "block"
-        })
-      }
+    AFRAME.registerComponent("image-target", {
+        schema: {
+            name: {
+                type: "string"
+            }
+        },
+        init: function() {
+            const e = this.el.object3D,
+                n = this.data.name;
+            e.visible = !1;
+            const t = ({
+                detail: t
+            }) => {
+                n == t.name && (e.position.set(t.position.x, t.position.y + 2, t.position.z), e.quaternion.copy(t.rotation), e.scale.set(t.scale, t.scale, t.scale), e.visible = !0)
+            };
+            this.el.sceneEl.addEventListener("xrimagefound", t), this.el.sceneEl.addEventListener("xrimageupdated", t), this.el.sceneEl.addEventListener("xrimagelost", ({
+                detail: t
+            }) => {
+                n == t.name && (e.visible = !1)
+            })
+        }
     })
+
+    // AFRAME.registerComponent('typing-text', {
+    //   init: function () {
+    //     const { object3D, sceneEl } = this.el
+    //     const typing_text = document.getElementById('typing')
+    //     const model = document.getElementById('startupchallenge')
+
+    //     sceneEl.addEventListener('xrimagefound', () => {
+    //         alert(model.getAttribute('visible'))
+    //        typing_text.style.display = "block" })
+    //     sceneEl.addEventListener('xrimagelost', () => { typing_text.style.display = "none" })
+    //   }
+    // })
+
+    // AFRAME.registerComponent('startupchallenge-scene', {
+    //   init: function () {
+    //     const { object3D, sceneEl } = this.el
+    //     const phandeeyar = document.getElementById('phandeeyar')
+    //     object3D.visible = false
+    //     // Sets the position of the frame to match the image target.
+    //     const showStartUp = ({ detail }) => {
+    //       phandeeyar.setAttribute('visible', "false")
+    //       alert("startupchallenage detected")
+    //       object3D.quaternion.copy(detail.rotation)
+    //       object3D.scale.set(detail.scale, detail.scale, detail.scale)
+    //       object3D.position.set(detail.position.x, detail.position.y, detail.position.z)
+    //       object3D.visible = true
+    //     }
+    //     sceneEl.addEventListener('xrimagefound', showStartUp)
+    //     // sceneEl.addEventListener('xrimageupdated', showStartUp)
+    //     sceneEl.addEventListener('xrimagelost', () => {object3D.visible = false})
+    //   }
+    // })
 
   </script>
   <script>
@@ -139,13 +221,21 @@
 </head>
 
 <body>
-  <a-scene typing-text clear-button background-sound xantialias="true" xrweb="disableWorldTracking: true"
-    xrextras-almost-there xrextras-loading xrextras-runtime-error>
+  <a-scene  
+  xantialias="true" 
+  xrweb="disableWorldTracking: true"
+  xrextras-almost-there 
+  xrextras-loading
+  xrextras-gesture-detector
+  clear-button  
+  startupchallenge-component
+  phandeeyar-component 
+  xrextras-runtime-error>
 
     <a-assets>
       <audio id="bgSound" src="./data-files/music.mp3"></audio>
-      <!-- <a-sound src="./data-files/music.mp3" autoplay="false" id="bgSound"></a-sound> -->
       <a-asset-item id="phandeeyarModel" src="./data-files/Phandeeyar_Logo.glb"></a-asset-item>
+      <!-- <a-asset-item id="frame-glb" src="./data-files/Talking.glb"></a-asset-item> -->
     </a-assets>
 
     <a-camera position="0 4 10">
@@ -155,19 +245,32 @@
 
     <a-light type="ambient" intensity="1"></a-light>
 
-    <a-entity image-target rotation="0 0 0" id="model"
-      animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
-      <a-entity gltf-model="#phandeeyarModel" scale=".03 .03 .03">
-      </a-entity>
+    <a-entity 
+    image-target="name: phandeeyar" 
+    id="phandeeyar" 
+    rotation="0 0 0"
+    animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"> 
+      <a-entity  scale=".03 .03 .03" gltf-model="#phandeeyarModel"></a-entity>
     </a-entity>
+
+    <a-entity 
+    image-target="name: startupchallenge2019" 
+    id="startupchallenge"
+    >
+        <a-entity  scale=".008 .008 .008" gltf-model="#phandeeyarModel"></a-entity>
+    </a-entity>
+
   </a-scene>
-  <div id="typing" class="typing" hidden>Laravel’s task scheduling features are well documented and give you the full
-    power of cron in a fluent API. The documentation covers most of what you need to get up and running with the
-    scheduler quickly, however, there are a few underlying concepts I’d like to cover related to cron that will help
-    solidify your understanding of how Laravel determines which scheduled tasks should run.</div>
+
+  <div id="startupchallenge-text" class="typing">
+    Make your tech business idea become reality, win up to $2,500 and 3 months of free office space - all within 9 days by participating in Startup Challenge 2019. Participants do not need expertise on any of the specific sectors; Phandeeyar is bringing topic experts to train and mentor participants before and throughout the competition. All participants will be mentored to develop​ business models using the Lean Canvas, which is an essential startup building/idea prototyping tool used around the globe.
+  </div>
+  <div id="phandeeyar-text" class="typing">Phandeeyar (“creation place”) is an innovation lab that is spearheading the use of technology to accelerate change and development in Myanmar. Phandeeyar invests in local technology startups, trains new entrepreneurs and builds the pool of tech talent. Phandeeyar also helps civic and social entrepreneurs, CSOs and independent media use technology to increase their impact and runs a co-working space out of its 10,000 square foot space located in the heart of downtown Yangon.</div>
+ 
   <div id="clear" class="clear">
     Clear
   </div>
 </body>
 
 </html>
+<!-- phandeeyar-component   startupchallenge-component-->

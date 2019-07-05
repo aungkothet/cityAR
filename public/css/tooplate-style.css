@@ -204,6 +204,10 @@ button:focus { outline: none; }
 	background-color: white; 
 	color: black;
 }
+
+.tm-bg-dark-blue .tm-text{
+	color: #FFFFFF;
+}
 .tm-bg-brown { background-color: #856729; }
 .tm-bg-dark-brown { background-color: #5a471c; }
 .tm-home-description-container { padding: 50px; }
